@@ -1,9 +1,7 @@
-const { fstat } = require('fs');
 const inquirer = require('inquirer');
 const fs = require('fs');
-// We now have access to all of the file system methods
 const generatePage = require('./src/page-template.js');
-const { generate } = require('rxjs');
+const { writeFile, copyFile } = require('./utils/generate-site.js');
 
 const mockData = {
     name: 'Lernantino',
@@ -52,7 +50,7 @@ const mockData = {
 };
 
 const pageHTML = generatePage(mockData);
-fs.writeFile('./index.html', pageHTML, err => {
+fs.writeFile('./dist/index.html', pageHTML, err => {
     if (err) throw new Error(err);
     console.log('Page created!');
 });
@@ -180,37 +178,20 @@ const promptProject = portfolioData => {
     });
 };
 
-// Therefor, we append the .then() method onto it
-// Makes it so it doesn't handle the then inside the function 
-// promptUser().then(answers => Object.values(answers).map(answer => console.log(answer)));
+promptUser()
+    .then(promptProject)
+    .then(portfolioData => {
+        return generatePage(portfolioData);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse)
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
-// promptUser()
-//     .then(promptProject)
-//     .then(portfolioData => {
-//         const pageHTML = generatePage(portfolioData);
-//         fs.writeFile('./index.html', pageHTML, err => {
-//             if (err) throw new Error(err);
-//             console.log('Page created!');
-//         })
-//     });
-
-
-
-// promptUser()
-//     .then(answers => console.log(answers))
-//     .then(promptProject)
-//     .then(projectAnswers => {
-//         console.log(projectAnswers)
-//         if (projectAnswers.confirmAddProject) {
-//             promptProject()
-//         }
-//     });
-
-
-// promptUser()
-//     .then(answers => {
-//         // console.log(answers);
-//         promptProject().then(projectAnswers => console.log(answers, projectAnswers));
-//     });
-
-// // console.log("Go T-Wolves!");
+// console.log("Go T-Wolves!");
